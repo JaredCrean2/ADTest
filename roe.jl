@@ -1,4 +1,4 @@
-type ParamType{Tdim, T}
+mutable struct ParamType{Tdim, T}
   res_vals::Array{T, 1}
   res_vals2::Array{T, 1}
   q_vals::Array{T, 1}
@@ -9,7 +9,7 @@ type ParamType{Tdim, T}
   gamma::Float64
   gamma_1::Float64
 
-  function ParamType(numDofPerNode)
+  function ParamType{Tdim, T}(numDofPerNode) where {Tdim, T}
     res_vals = zeros(T, numDofPerNode)
     res_vals2 = zeros(T, numDofPerNode)
     q_vals = zeros(T, numDofPerNode)
