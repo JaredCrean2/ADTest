@@ -5,6 +5,7 @@ mutable struct ParamType{Tdim, T}
   v_vals2::Array{T, 1}
   flux_vals1::Array{T, 1}
   sat_vals::Array{T, 1}
+  euler_fluxjac::Array{T, 2}
   nrm::Array{T, 1}
   gamma::Float64
   gamma_1::Float64
@@ -16,11 +17,12 @@ mutable struct ParamType{Tdim, T}
     v_vals2 = zeros(T, numDofPerNode)
     flux_vals1 = zeros(T, numDofPerNode)
     sat_vals = zeros(T, numDofPerNode)
+    euler_fluxjac = zeros(T, numDofPerNode, numDofPerNode)
     nrm = zeros(T, Tdim)
     gamma = 1.4
     gamma_1 = 0.4
 
-    return new(res_vals, res_vals2, q_vals, v_vals2, flux_vals1, sat_vals, nrm, gamma, gamma_1)
+    return new(res_vals, res_vals2, q_vals, v_vals2, flux_vals1, sat_vals, euler_fluxjac, nrm, gamma, gamma_1)
   end
 end
 
@@ -96,7 +98,6 @@ function RoeSolver{Tmsh, Tsol, Tres}(params::ParamType{2},
   u = (sqL*uL + sqR*uR)*fac
   v = (sqL*vL + sqR*vR)*fac
   H = (sqL*HL + sqR*HR)*fac
-
 
   dq = params.v_vals2 # zeros(Tsol, 4)
   for i=1:length(dq)

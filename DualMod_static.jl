@@ -41,70 +41,70 @@ struct Dual{DIM} <: AbstDual
 end
 
 
-function convert{DIM}(::Type{Dual{DIM}}, v::Real)
+@inline function convert{DIM}(::Type{Dual{DIM}}, v::Real)
     return Dual{DIM}(v)
 end
-function >{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function >{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     return d1.v > d2.v
 end
-function >{DIM}(d1::Dual{DIM}, s::Real)
+@inline function >{DIM}(d1::Dual{DIM}, s::Real)
     return d1.v > s
 end
-function >{DIM}(s::Real, d1::Dual{DIM})
+@inline function >{DIM}(s::Real, d1::Dual{DIM})
     return s > d1.v
 end
 
-function >={DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function >={DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     return d1.v >= d2.v
 end
-function >={DIM}(d1::Dual{DIM}, s::Real)
+@inline function >={DIM}(d1::Dual{DIM}, s::Real)
     return d1.v >= s
 end
-function >={DIM}(s::Real, d1::Dual{DIM})
+@inline function >={DIM}(s::Real, d1::Dual{DIM})
     return s >= d1.v
 end
 
-function <{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function <{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     return d1.v < d2.v
 end
-function <{DIM}(d1::Dual{DIM}, s::Real)
+@inline function <{DIM}(d1::Dual{DIM}, s::Real)
     return d1.v < s
 end
-function <{DIM}(s::Real, d1::Dual{DIM})
+@inline function <{DIM}(s::Real, d1::Dual{DIM})
     return s < d1.v
 end
 
-function <={DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function <={DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     return d1.v <= d2.v
 end
-function <={DIM}(d1::Dual{DIM}, s::Real)
+@inline function <={DIM}(d1::Dual{DIM}, s::Real)
     return d1.v <= s
 end
-function <={DIM}(s::Real, d1::Dual{DIM})
+@inline function <={DIM}(s::Real, d1::Dual{DIM})
     return s <= d1.v
 end
 
-function !={DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function !={DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     return d1.v != d2.v
 end
-function !={DIM}(d1::Dual{DIM}, s::Real)
+@inline function !={DIM}(d1::Dual{DIM}, s::Real)
     return d1.v != s
 end
-function !={DIM}(s::Real, d1::Dual{DIM})
+@inline function !={DIM}(s::Real, d1::Dual{DIM})
     return s != d1.v
 end
 
-function =={DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function =={DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     return d1.v == d2.v
 end
-function =={DIM}(d1::Dual{DIM}, s::Real)
+@inline function =={DIM}(d1::Dual{DIM}, s::Real)
     return d1.v == s
 end
-function =={DIM}(s::Real, d1::Dual{DIM})
+@inline function =={DIM}(s::Real, d1::Dual{DIM})
     return s == d1.v
 end
 
-function +{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function +{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     v = d1.v + d2.v
 #    d = Array{Float64}(DIM)
     d = d1.d + d2.d
@@ -114,7 +114,7 @@ function +{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
 #    end
     return Dual{DIM}(v, d)
 end
-function +{DIM}(d1::Dual{DIM}, s::Real)
+@inline function +{DIM}(d1::Dual{DIM}, s::Real)
     v = d1.v + s
     d = d1.d  # these things have value semantics
 #    d = zeros(Float64, DIM)
@@ -123,7 +123,7 @@ function +{DIM}(d1::Dual{DIM}, s::Real)
 #    end
     return Dual{DIM}(v, d)
 end
-function +{DIM}(s::Real, d1::Dual{DIM})
+@inline function +{DIM}(s::Real, d1::Dual{DIM})
     v = d1.v + s
     d = d1.d
 #    d = zeros(Float64, DIM)
@@ -133,7 +133,7 @@ function +{DIM}(s::Real, d1::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function -{DIM}(s::Real, d1::Dual{DIM})
+@inline function -{DIM}(s::Real, d1::Dual{DIM})
     v = s - d1.v
     d = -vec
 #    d = zeros(Float64, DIM)
@@ -143,7 +143,7 @@ function -{DIM}(s::Real, d1::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function -{DIM}(d1::Dual{DIM}, s::Real)
+@inline function -{DIM}(d1::Dual{DIM}, s::Real)
     v = d1.v - s
     d = -d1.d
 #    d = zeros(Float64, DIM)
@@ -153,7 +153,7 @@ function -{DIM}(d1::Dual{DIM}, s::Real)
     return Dual{DIM}(v, d)
 end
 
-function -{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function -{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     v = d1.v - d2.v
     d = d1.d - d2.d
 #    d = Array{Float64}(DIM)
@@ -163,7 +163,7 @@ function -{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function *{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function *{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     v = d1.v * d2.v
 
     d = d1.d*d2.v + d1.v*d2.d
@@ -174,7 +174,7 @@ function *{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function *{DIM}(d1::Dual{DIM}, s::Real)
+@inline function *{DIM}(d1::Dual{DIM}, s::Real)
     v = d1.v * s
 
     d = d1.d*s
@@ -185,7 +185,7 @@ function *{DIM}(d1::Dual{DIM}, s::Real)
     return Dual{DIM}(v, d)
 end
 
-function *{DIM}(s::Real, d1::Dual{DIM})
+@inline function *{DIM}(s::Real, d1::Dual{DIM})
     v = d1.v * s
 
     d = d1.d*s
@@ -195,7 +195,7 @@ function *{DIM}(s::Real, d1::Dual{DIM})
 #    end
     return Dual{DIM}(v, d)
 end
-function /{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
+@inline function /{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     v = d1.v/d2.v
 #    d = Array{Float64}(DIM)
     v2 = 1./(d2.v * d2.v)
@@ -206,7 +206,7 @@ function /{DIM}(d1::Dual{DIM}, d2::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function /{DIM}(d1::Dual{DIM}, s::Real)
+@inline function /{DIM}(d1::Dual{DIM}, s::Real)
     v = d1.v/s
 #    d = Array{Float64}(DIM)
     d = d1.d/s
@@ -216,7 +216,7 @@ function /{DIM}(d1::Dual{DIM}, s::Real)
     return Dual{DIM}(v, d)
 end
 
-function /{DIM}(s::Real, d1::Dual{DIM})
+@inline function /{DIM}(s::Real, d1::Dual{DIM})
     v = s / d1.v
 #    d = Array{Float64}(DIM)
     v2 = -1./(d1.v * d1.v)
@@ -227,7 +227,7 @@ function /{DIM}(s::Real, d1::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function sin{DIM}(d1::Dual{DIM})
+@inline function sin{DIM}(d1::Dual{DIM})
  #   d = Array{Float64}(DIM)
     v = sin(d1.v)
     dsin = cos(d1.v)
@@ -238,7 +238,7 @@ function sin{DIM}(d1::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function cos{DIM}(d1::Dual{DIM})
+@inline function cos{DIM}(d1::Dual{DIM})
 #    d = Array{Float64}(DIM)
     v = cos(d1.v)
     dcos = -sin(d1.v)
@@ -249,7 +249,7 @@ function cos{DIM}(d1::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function exp{DIM}(d1::Dual{DIM})
+@inline function exp{DIM}(d1::Dual{DIM})
 #    d = Array{Float64}(DIM)
     v = exp(d1.v)
     dexp = v
@@ -260,7 +260,7 @@ function exp{DIM}(d1::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function sqrt{DIM}(d1::Dual{DIM})
+@inline function sqrt{DIM}(d1::Dual{DIM})
     # @assert(d1.v >= 0.0)
 #    d = Array{Float64}(DIM)
     v = sqrt(d1.v)
@@ -272,11 +272,11 @@ function sqrt{DIM}(d1::Dual{DIM})
     return Dual{DIM}(v, d)
 end
 
-function zero{DIM}(::Type{Dual{DIM}})
+@inline function zero{DIM}(::Type{Dual{DIM}})
     return Dual{DIM}()
 end
 
-function abs{DIM}(d1::Dual{DIM})
+@inline function abs{DIM}(d1::Dual{DIM})
     if d1.v >= 0.0
         return d1
     else
@@ -285,7 +285,7 @@ function abs{DIM}(d1::Dual{DIM})
 end
 
 
-function dot{DIM}(v1::AbstractArray{Dual{DIM}, 1},
+@inline function dot{DIM}(v1::AbstractArray{Dual{DIM}, 1},
                   v2::AbstractArray{Dual{DIM}, 1})
     val = Dual{DIM}()
     len = length(v1)
@@ -295,7 +295,7 @@ function dot{DIM}(v1::AbstractArray{Dual{DIM}, 1},
     return val
 end
 
-function dot{DIM, T}(v1::AbstractArray{Dual{DIM}, 1},
+@inline function dot{DIM, T}(v1::AbstractArray{Dual{DIM}, 1},
                      v2::AbstractArray{T, 1})
     val = Dual{DIM}()
     len = length(v1)
@@ -305,7 +305,7 @@ function dot{DIM, T}(v1::AbstractArray{Dual{DIM}, 1},
     return val
 end
 
-function dot{DIM, T}(v1::AbstractArray{T, 1},
+@inline function dot{DIM, T}(v1::AbstractArray{T, 1},
                      v2::AbstractArray{Dual{DIM}, 1})
     val = Dual{DIM}()
     len = length(v1)
