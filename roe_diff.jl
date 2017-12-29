@@ -93,12 +93,14 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
   u = (sqL*uL + sqR*uR)*fac
   t2 = sqR*uR
   t3 = sqL*uL
+  t4 = sqL*fac
+  t5 = sqR*fac
   u_dotL1 = t3*fac_dotL1 + sqL*fac*uL_dot1 + uL*fac*sqL_dot1 + t2*fac_dotL1
   u_dotR1 = t2*fac_dotR1 + sqR*fac*uR_dot1 + uR*fac*sqR_dot1 + t3*fac_dotR1
 
 
-  u_dotL2 = sqL*fac*uL_dot2
-  u_dotR2 = sqR*fac*uR_dot2
+  u_dotL2 = t4*uL_dot2
+  u_dotR2 = t5*uR_dot2
 
   v = (sqL*vL + sqR*vR)*fac
   t2 = sqL*vL
@@ -106,23 +108,23 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
   v_dotL1 = t2*fac_dotL1 + sqL*fac*vL_dot1 + vL*fac*sqL_dot1 + t3*fac_dotL1
   v_dotR1 = t3*fac_dotR1 + sqR*fac*vR_dot1 + vR*fac*sqR_dot1 + t2*fac_dotR1
 
-  v_dotL3 = sqL*fac*vL_dot3
-  v_dotR3 = sqR*fac*vR_dot3
+  v_dotL3 = t4*vL_dot3
+  v_dotR3 = t5*vR_dot3
 
   H = (sqL*HL + sqR*HR)*fac
   t2 = sqL*HL
   t3 = sqR*HR
   H_dotL1 = t2*fac_dotL1 + sqL*fac*HL_dot1 + HL*fac*sqL_dot1 + t3*fac_dotL1
   H_dotR1 = t3*fac_dotR1 + sqR*fac*HR_dot1 + HR*fac*sqR_dot1 + t2*fac_dotR1
-  
-  H_dotL2 = sqL*fac*HL_dot2 
-  H_dotR2 = sqR*fac*HR_dot2
+ 
+  H_dotL2 = t4*HL_dot2 
+  H_dotR2 = t5*HR_dot2
 
-  H_dotL3 = sqL*fac*HL_dot3
-  H_dotR3 = sqR*fac*HR_dot3
+  H_dotL3 = t4*HL_dot3
+  H_dotR3 = t5*HR_dot3
 
-  H_dotL4 = sqL*fac*HL_dot4
-  H_dotR4 = sqR*fac*HR_dot4
+  H_dotL4 = t4*HL_dot4
+  H_dotR4 = t5*HR_dot4
 
 
   dq = params.v_vals2 # zeros(Tsol, 4)
@@ -180,37 +182,38 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
   calcEulerFlux_diff(params, q, aux_vars, nrm2, euler_fluxjac)
 
   fluxL_dot[1, 1] = sat_fac*sat1_dotL1 + euler_fluxjac[1, 1]
-  fluxL_dot[1, 2] =                      euler_fluxjac[1, 2]
-  fluxL_dot[1, 3] =                      euler_fluxjac[1, 3]
-  fluxL_dot[1, 4] =                      euler_fluxjac[1, 4]
-
   fluxL_dot[2, 1] = sat_fac*sat2_dotL1 + euler_fluxjac[2, 1]
-  fluxL_dot[2, 2] = sat_fac*sat2_dotL2 + euler_fluxjac[2, 2]
-  fluxL_dot[2, 3] =                      euler_fluxjac[2, 3]
-  fluxL_dot[2, 4] =                      euler_fluxjac[2, 4]
-  
   fluxL_dot[3, 1] = sat_fac*sat3_dotL1 + euler_fluxjac[3, 1]
-  fluxL_dot[3, 2] =                    + euler_fluxjac[3, 2]
-  fluxL_dot[3, 3] = sat_fac*sat3_dotL3 + euler_fluxjac[3, 3]
-  fluxL_dot[3, 4] =                    + euler_fluxjac[3, 4]
-
   fluxL_dot[4, 1] = sat_fac*sat4_dotL1 + euler_fluxjac[4, 1]
+
+  fluxL_dot[1, 2] =                      euler_fluxjac[1, 2]
+  fluxL_dot[2, 2] = sat_fac*sat2_dotL2 + euler_fluxjac[2, 2]
+  fluxL_dot[3, 2] =                    + euler_fluxjac[3, 2]
   fluxL_dot[4, 2] = sat_fac*sat4_dotL2 + euler_fluxjac[4, 2]
+
+  fluxL_dot[1, 3] =                      euler_fluxjac[1, 3]
+  fluxL_dot[2, 3] =                      euler_fluxjac[2, 3]
+  fluxL_dot[3, 3] = sat_fac*sat3_dotL3 + euler_fluxjac[3, 3]
   fluxL_dot[4, 3] = sat_fac*sat4_dotL3 + euler_fluxjac[4, 3]
+
+  fluxL_dot[1, 4] =                      euler_fluxjac[1, 4]
+  fluxL_dot[2, 4] =                      euler_fluxjac[2, 4]
+  fluxL_dot[3, 4] =                    + euler_fluxjac[3, 4]
   fluxL_dot[4, 4] = sat_fac*sat4_dotL4 + euler_fluxjac[4, 4]
 
   fill!(fluxR_dot, 0.0)
   fluxR_dot[1, 1] = sat_fac*sat1_dotR1
 
   fluxR_dot[2, 1] = sat_fac*sat2_dotR1
-  fluxR_dot[2, 2] = sat_fac*sat2_dotR2
-
   fluxR_dot[3, 1] = sat_fac*sat3_dotR1
-  fluxR_dot[3, 3] = sat_fac*sat3_dotR3
-
   fluxR_dot[4, 1] = sat_fac*sat4_dotR1
+
+  fluxR_dot[2, 2] = sat_fac*sat2_dotR2
   fluxR_dot[4, 2] = sat_fac*sat4_dotR2
+
+  fluxR_dot[3, 3] = sat_fac*sat3_dotR3
   fluxR_dot[4, 3] = sat_fac*sat4_dotR3
+
   fluxR_dot[4, 4] = sat_fac*sat4_dotR4
 
   return nothing
