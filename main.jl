@@ -8,7 +8,7 @@ global const numEl = 100000
 # flux evaluation
 function main()
   q = [2.0, 3.0, 4.0, 7.0]
-  qg = [2.0, 3.0, 4.0, 7.0]
+  qg = [3.0, 4.0, 5.0, 8.0]
   aux_vars = Float64[0.0]
   nrm = Float64[2.0, 2.0]
   F = zeros(Float64, 4)
@@ -29,7 +29,7 @@ end
 # dual number evaluation
 function main2()
   q = Dual{NDUAL}[2.0, 3.0, 4.0, 7.0]
-  qg = Dual{NDUAL}[2.0, 3.0, 4.0, 7.0]
+  qg = Dual{NDUAL}[3.0, 4.0, 5.0, 8.0]
   aux_vars = Dual{NDUAL}[0.0]
   nrm = Dual{NDUAL}[2.0, 2.0]
   F = zeros(Dual{NDUAL}, 4)
@@ -52,7 +52,7 @@ end
 # complex numbers
 function main3()
   q = Complex128[2.0, 3.0, 4.0, 7.0]
-  qg = Complex128[2.0, 3.0, 4.0, 7.0]
+  qg = Complex128[3.0, 4.0, 5.0, 8.0]
   aux_vars = Complex128[0.0]
   nrm = Float64[2.0, 2.0]
   F = zeros(Complex128, 4)
@@ -94,7 +94,7 @@ end
 # hand-written AD
 function main4()
   q = [2.0, 3.0, 4.0, 7.0]
-  qg = [2.0, 3.0, 4.0, 7.0]
+  qg = [3.0, 4.0, 5.0, 8.0]
   aux_vars = Float64[0.0]
   nrm = Float64[2.0, 2.0]
   F_dotL = zeros(Float64, 4, 4)

@@ -29,7 +29,8 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
   # The left state of Roe are the actual solution variables
   # All the _dot variables are wrt q
   fac = d1_0/q[1]
-  fac_dot1 = -d1_0/(q[1]*q[1])
+  fac_dot1 = -fac*fac
+#  fac_dot1 = -d1_0/(q[1]*q[1])
 
   uL = q[2]*fac
   uL_dot1 = q[2]*fac_dot1
@@ -40,9 +41,9 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
   vL_dot3 = fac
 
   phi = d0_5*(uL*uL + vL*vL)
-  phi_dot1 = d0_5*(2*uL*uL_dot1 + 2*vL*vL_dot1)
-  phi_dot2 = d0_5*(2*uL*uL_dot2)
-  phi_dot3 = d0_5*(2*vL*vL_dot3)
+  phi_dot1 = uL*uL_dot1 + vL*vL_dot1
+  phi_dot2 = uL*uL_dot2
+  phi_dot3 = vL*vL_dot3
 
   HL = gamma*q[4]*fac - gami*phi # Total enthalpy, H = e + 0.5*(u^2 + v^2) + p/rho,
                                  # where e is the internal energy per unit mass
@@ -54,7 +55,8 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
   # The right side of the Roe solver comprises the boundary conditions
   # all the _dot variables are wrt qg now
   fac = d1_0/qg[1]
-  fac_dot1 = -d1_0/(qg[1]*qg[1])
+  fac_dot1 = -fac*fac
+#  fac_dot1 = -d1_0/(qg[1]*qg[1])
 
   uR = qg[2]*fac
   uR_dot1 = qg[2]*fac_dot1
@@ -65,9 +67,9 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
   vR_dot3 = fac
 
   phi = d0_5*(uR*uR + vR*vR)
-  phi_dot1 = d0_5*(2*uR*uR_dot1 + 2*vR*vR_dot1)
-  phi_dot2 = d0_5*(2*uR*uR_dot2)
-  phi_dot3 = d0_5*(2*vR*vR_dot3)
+  phi_dot1 = uR*uR_dot1 + vR*vR_dot1
+  phi_dot2 = uR*uR_dot2
+  phi_dot3 = vR*vR_dot3
 
 
   HR = gamma*qg[4]*fac - gami*phi # Total Enthalpy
@@ -78,42 +80,49 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
 
   # Averaged states
   sqL = sqrt(q[1])
-  sqL_dot1 = 0.5/sqrt(q[1])
+  sqL_dot1 = 0.5/sqL
 
   sqR = sqrt(qg[1])
-  sqR_dot1 = 0.5/sqrt(qg[1])
+  sqR_dot1 = 0.5/sqR
 
   fac = d1_0/(sqL + sqR)
-  fac_dotL1 = (-1/( (sqL + sqR)*(sqL + sqR) ))*sqL_dot1
-  fac_dotR1 = (-1/( (sqL + sqR)*(sqL + sqR) ))*sqR_dot1
+  t1 = -1/((sqL + sqR)*(sqL + sqR))
+  fac_dotL1 = t1*sqL_dot1
+  fac_dotR1 = t1*sqR_dot1
 
   u = (sqL*uL + sqR*uR)*fac
-  u_dotL1 = sqL*uL*fac_dotL1 + sqL*fac*uL_dot1 + uL*fac*sqL_dot1 + sqR*uR*fac_dotL1
-  u_dotR1 = sqR*uR*fac_dotR1 + sqR*fac*uR_dot1 + uR*fac*sqR_dot1 + sqL*uL*fac_dotR1
+  t2 = sqR*uR
+  t3 = sqL*uL
+  u_dotL1 = t3*fac_dotL1 + sqL*fac*uL_dot1 + uL*fac*sqL_dot1 + t2*fac_dotL1
+  u_dotR1 = t2*fac_dotR1 + sqR*fac*uR_dot1 + uR*fac*sqR_dot1 + t3*fac_dotR1
 
 
   u_dotL2 = sqL*fac*uL_dot2
   u_dotR2 = sqR*fac*uR_dot2
 
   v = (sqL*vL + sqR*vR)*fac
-  v_dotL1 = sqL*vL*fac_dotL1 + sqL*fac*vL_dot1 + vL*fac*sqL_dot1 + sqR*vR*fac_dotL1
-  v_dotR1 = sqR*vR*fac_dotR1 + sqR*fac*vR_dot1 + vR*fac*sqR_dot1 + sqL*vL*fac_dotR1
+  t2 = sqL*vL
+  t3 = sqR*vR
+  v_dotL1 = t2*fac_dotL1 + sqL*fac*vL_dot1 + vL*fac*sqL_dot1 + t3*fac_dotL1
+  v_dotR1 = t3*fac_dotR1 + sqR*fac*vR_dot1 + vR*fac*sqR_dot1 + t2*fac_dotR1
 
   v_dotL3 = sqL*fac*vL_dot3
   v_dotR3 = sqR*fac*vR_dot3
 
   H = (sqL*HL + sqR*HR)*fac
-  H_dotL1 = sqL*HL*fac_dotL1 + sqL*fac*HL_dot1 + HL*fac*sqL_dot1 + sqR*HR*fac_dotL1
-  H_dotR1 = sqR*HR*fac_dotR1 + sqR*fac*HR_dot1 + HR*fac*sqR_dot1 + sqL*HL*fac_dotR1
+  t2 = sqL*HL
+  t3 = sqR*HR
+  H_dotL1 = t2*fac_dotL1 + sqL*fac*HL_dot1 + HL*fac*sqL_dot1 + t3*fac_dotL1
+  H_dotR1 = t3*fac_dotR1 + sqR*fac*HR_dot1 + HR*fac*sqR_dot1 + t2*fac_dotR1
   
   H_dotL2 = sqL*fac*HL_dot2 
-  H_dotR2 = sqL*fac*HR_dot2
+  H_dotR2 = sqR*fac*HR_dot2
 
   H_dotL3 = sqL*fac*HL_dot3
-  H_dotR3 = sqL*fac*HR_dot3
+  H_dotR3 = sqR*fac*HR_dot3
 
   H_dotL4 = sqL*fac*HL_dot4
-  H_dotR4 = sqL*fac*HR_dot4
+  H_dotR4 = sqR*fac*HR_dot4
 
 
   dq = params.v_vals2 # zeros(Tsol, 4)
@@ -127,7 +136,7 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
 #  calcSAT(params, nrm, dq, sat, u, v, H, use_efix)
   
   sat[1] = q[1]*dq[1]
-  sat1_dotL1 = qg[1]*1
+  sat1_dotL1 = dq[1]*1 + q[1]
   sat1_dotR1 = -q[1]
 
   sat[2] = u*dq[2]
@@ -169,7 +178,6 @@ function RoeSolver_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
 
 #  convertFromNaturalToWorkingVars(params, q, v_vals)
   calcEulerFlux_diff(params, q, aux_vars, nrm2, euler_fluxjac)
-
 
   fluxL_dot[1, 1] = sat_fac*sat1_dotL1 + euler_fluxjac[1, 1]
   fluxL_dot[1, 2] =                      euler_fluxjac[1, 2]
@@ -227,34 +235,34 @@ function calcEulerFlux_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
   press = calcPressure_diff(params, q, p_dot)
 #  press = getPressure(aux_vars)
 #  press = @getPressure(aux_vars)
-  U = (q[2]*dir[1] + q[3]*dir[2])/q[1]
-  U_dot1 = -(q[2]*dir[1] + q[3]*dir[2])/(q[1]*q[1])
-  U_dot2 = dir[1]/q[1]
-  U_dot3 = dir[2]/q[1]
+  fac = 1/q[1]
+  U = (q[2]*dir[1] + q[3]*dir[2])*fac
+  U_dot1 = -(q[2]*dir[1] + q[3]*dir[2])*fac*fac
+  U_dot2 = dir[1]*fac
+  U_dot3 = dir[2]*fac
 
-  #TODO: make this column major
   # F[1] = q[1]*U
-  Fjac[1, 1] = U + q[1]*U_dot1
-  Fjac[1, 2] = q[1]*U_dot2
-  Fjac[1, 3] = q[1]*U_dot3
-  Fjac[1, 4] = 0
-
   # F[2] = q[2]*U + dir[1]*press
+  # F[3] = q[3]*U + dir[2]*press
+  # F[4] = (q[4] + press)*U
+  Fjac[1, 1] = U + q[1]*U_dot1
   Fjac[2, 1] = q[2]*U_dot1 + dir[1]*p_dot[1]
-  Fjac[2, 2] = U + q[2]*U_dot2 + dir[1]*p_dot[2]
-  Fjac[2, 3] = q[2]*U_dot3 + dir[1]*p_dot[3]
-  Fjac[2, 4] = dir[1]*p_dot[4]
-
-  #F[3] = q[3]*U + dir[2]*press
   Fjac[3, 1] = q[3]*U_dot1 + dir[2]*p_dot[1]
-  Fjac[3, 2] = q[3]*U_dot2 + dir[2]*p_dot[2]
-  Fjac[3, 3] = U + q[3]*U_dot3 + dir[2]*p_dot[3]
-  Fjac[3, 4] = dir[2]*p_dot[4]
-
-  #F[4] = (q[4] + press)*U
   Fjac[4, 1] = q[4]*U_dot1 + press*U_dot1 + U*p_dot[1]
+
+  Fjac[1, 2] = q[1]*U_dot2
+  Fjac[2, 2] = U + q[2]*U_dot2 + dir[1]*p_dot[2]
+  Fjac[3, 2] = q[3]*U_dot2 + dir[2]*p_dot[2]
   Fjac[4, 2] = q[4]*U_dot2 + press*U_dot2 + U*p_dot[2]
+
+  Fjac[1, 3] = q[1]*U_dot3
+  Fjac[2, 3] = q[2]*U_dot3 + dir[1]*p_dot[3]
+  Fjac[3, 3] = U + q[3]*U_dot3 + dir[2]*p_dot[3]
   Fjac[4, 3] = q[4]*U_dot3 + press*U_dot3 + U*p_dot[3]
+
+  Fjac[1, 4] = 0
+  Fjac[2, 4] = dir[1]*p_dot[4]
+  Fjac[3, 4] = dir[2]*p_dot[4]
   Fjac[4, 4] = U + U*p_dot[4]
 
   return nothing
@@ -271,10 +279,10 @@ function calcPressure_diff{Tsol}(params::ParamType{2},
   t3 = q[3]*q[3]
 
   p_dot[1] = (params.gamma_1)*( 0.5*(t2*t1 + t3*t1))
-  p_dot[2] = -0.5*(params.gamma_1)*(2*q[2]/q[1])
-  p_dot[3] = -0.5*(params.gamma_1)*(2*q[3]/q[1])
+  p_dot[2] = -(params.gamma_1)*(q[2]/q[1])
+  p_dot[3] = -(params.gamma_1)*(q[3]/q[1])
   p_dot[4] = params.gamma_1
-  return  (params.gamma_1)*(q[4] - 0.5*(q[2]*q[2] + q[3]*q[3])/q[1])
+  return  (params.gamma_1)*(q[4] - 0.5*(t2 + t3)/q[1])
 end
 
 
