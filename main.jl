@@ -4,7 +4,7 @@ include("DualMod_static.jl")
 include("roe_diff.jl")
 
 global const NDUAL = 8
-
+global const numEl = 100000
 # flux evaluation
 function main()
   q = [2.0, 3.0, 4.0, 7.0]
@@ -14,7 +14,6 @@ function main()
   F = zeros(Float64, 4)
   params = ParamType{2, Float64}(4)
 
-  numEl = 10000
   res = zeros(4, numEl)
   @time for i=1:numEl
     q[2] =+ 0.01
@@ -36,7 +35,6 @@ function main2()
   F = zeros(Dual{NDUAL}, 4)
   params = ParamType{2, Dual{NDUAL}}(4)
 
-  numEl = 10000
   res = zeros(Dual{NDUAL}, 4, numEl)
   @time for i=1:numEl
     q[2] =+ 0.01
@@ -60,7 +58,6 @@ function main3()
   F = zeros(Complex128, 4)
   params = ParamType{2, Complex128}(4)
 
-  numEl = 10000
   resL = zeros(4, 4, numEl)
   resR = zeros(4, 4, numEl)
   h = 1e-20
@@ -104,7 +101,6 @@ function main4()
   F_dotR = zeros(Float64, 4, 4)
   params = ParamType{2, Float64}(4)
 
-  numEl = 10000
   resL = zeros(4, 4, numEl)
   resR = zeros(4, 4, numEl)
   @time for i=1:numEl
@@ -135,11 +131,12 @@ println("Hand-written AD evaluation:")
 main4()
 main4()
 
-#=
+
+println("\nVerifying AD")
 res3L, res3R = main3()
-println("\n----- Testing AD -----")
 res4L, res4R = main4()
 
+#=
 println("\n----- Comparing left results -----")
 println("res3L = \n", res3L)
 println("res4L = \n", res4L)
@@ -152,3 +149,6 @@ println("res4R = \n", res4R)
 println("diff = \n", res3R - res4R)
 println("diffnorm = \n", vecnorm(res3R - res4R))
 =#
+
+@assert maximum(abs.(res3L - res4L)) < 1e-14
+@assert maximum(abs.(res3R - res4R)) < 1e-14

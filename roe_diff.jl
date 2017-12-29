@@ -222,7 +222,8 @@ function calcEulerFlux_diff{Tmsh, Tsol, Tres}(params::ParamType{2},
 # 2D  only
 
 
-  p_dot = zeros(q)  # TODO: replace this with a pre-allocated array
+  p_dot = params.p_dot
+#  p_dot = zeros(q)  # TODO: replace this with a pre-allocated array
   press = calcPressure_diff(params, q, p_dot)
 #  press = getPressure(aux_vars)
 #  press = @getPressure(aux_vars)

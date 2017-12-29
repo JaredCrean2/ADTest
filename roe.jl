@@ -6,6 +6,7 @@ mutable struct ParamType{Tdim, T}
   flux_vals1::Array{T, 1}
   sat_vals::Array{T, 1}
   euler_fluxjac::Array{T, 2}
+  p_dot::Array{T, 1}
   nrm::Array{T, 1}
   gamma::Float64
   gamma_1::Float64
@@ -18,11 +19,12 @@ mutable struct ParamType{Tdim, T}
     flux_vals1 = zeros(T, numDofPerNode)
     sat_vals = zeros(T, numDofPerNode)
     euler_fluxjac = zeros(T, numDofPerNode, numDofPerNode)
+    p_dot = zeros(T, numDofPerNode)
     nrm = zeros(T, Tdim)
     gamma = 1.4
     gamma_1 = 0.4
 
-    return new(res_vals, res_vals2, q_vals, v_vals2, flux_vals1, sat_vals, euler_fluxjac, nrm, gamma, gamma_1)
+    return new(res_vals, res_vals2, q_vals, v_vals2, flux_vals1, sat_vals, euler_fluxjac, p_dot, nrm, gamma, gamma_1)
   end
 end
 
