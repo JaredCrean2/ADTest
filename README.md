@@ -1,6 +1,8 @@
 This repo contains a small example of using the complex step method, dual numbers,
-and hand-written algorithmic differentiation to compute the jacobian of the
-Roe flux function with respect to the left and right states.
+and hand-written algorithmic differentiation to compute the jacobian of a
+modified Roe flux function with respect to the left and right states.
+To simplify the benchmark, the SAT term is replaced by a simple arithmetic
+function.
 
 The benchmark evaluates the jacobian at 100,000 different states.
 
